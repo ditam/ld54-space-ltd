@@ -1,5 +1,7 @@
 WIDTH = 1920;
 HEIGHT = 1080;
+BASE_SPEED = 4;
+INTERACTION_SIZE = 50;
 
 function getRandomItem(array) {
   return array[Math.floor(Math.random() * array.length)];
@@ -72,15 +74,32 @@ const planets = [
 function drawFrame(timestamp) {
   ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
-  player.ships.forEach(s=>{
-    ctx.fillStyle = 'white';
-    ctx.fillRect(s.x, s.y, 50, 50);
-  });
-
+  // draw planets
   planets.forEach(p=>{
     ctx.fillStyle = 'brown';
     ctx.arc(p.x, p.y, 50, 0, 2*Math.PI);
     ctx.fill();
+  });
+
+  player.ships.forEach(s=>{
+    // move towards target
+    if (s.target) {
+      let t = s.target;
+      let dX = t.x - s.x;
+      let dY = t.y - s.y;
+      const dist = Math.sqrt(dX*dX + dY*dY);
+      // dX/dY is the unit vector pointing at target
+      dX = dX / dist;
+      dY = dY / dist;
+      if (dist > INTERACTION_SIZE) {
+        s.x += dX * BASE_SPEED;
+        s.y += dY * BASE_SPEED;
+      }
+    }
+
+    // draw ship
+    ctx.fillStyle = 'white';
+    ctx.fillRect(s.x, s.y, 50, 50);
   });
 
   requestAnimationFrame(drawFrame);
@@ -97,6 +116,7 @@ function generateButtons() {
     button.appendTo(container);
     button.on('click', () => {
       console.log('button for planet:', p);
+      player.ships[0].target = {x: p.x, y: p.y};
     });
   });
 }
