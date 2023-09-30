@@ -18,3 +18,15 @@ canvas {
   background: rgb(4,32,37);
   background: linear-gradient(135deg, rgb(6, 44, 50) -40%, rgb(3, 0, 37) 100%);
 }
+
+.button {
+  position: absolute;
+  cursor: pointer;
+  padding: 5px;
+  border: 1px solid black;
+  border-radius: 3px;
+}
+
+.button:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}

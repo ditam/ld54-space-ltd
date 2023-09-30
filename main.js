@@ -14,10 +14,11 @@ function getRandomInt(min, max) { // min and max included
 
 let DEBUG = location && location.hostname==='localhost';
 
-let ctx, debugLog;
+let container, ctx, debugLog;
 
-const stars = [];
 function generateStarfield() {
+  console.log('starfield init');
+  const stars = [];
   for (let i=0; i<1000; i++) {
     const b = getRandomInt(0, 255); // brightness
     const dR = getRandomInt(0, 50);
@@ -30,35 +31,46 @@ function generateStarfield() {
       color: `rgb(${b+dR}, ${b+dG}, ${b+dB})`
     });
   }
+
+  const sfCanvas = document.getElementById('bg-canvas');
+  $(sfCanvas).attr('height', HEIGHT);
+  $(sfCanvas).attr('width', WIDTH);
+
+  const sfCtx = sfCanvas.getContext('2d');
+    // TODO: move to separate canvas and single step
+  stars.forEach(s=>{
+    sfCtx.fillStyle = s.color;
+    sfCtx.fillRect(s.x, s.y, s.size, s.size);
+  });
 }
 
 const player = {
   ships: [{
     x: 300,
-    y: 400
+    y: 400,
+    cargo: [
+      [0, 0, 0],
+      [0, 0, 0],
+      [0, 0, 0]
+    ]
   }]
 };
 
 const planets = [
   {
+    name: 'P1',
     x: 1500,
     y: 300
   },
   {
+    name: 'P2',
     x: 500,
     y: 800
   }
 ];
 
 function drawFrame(timestamp) {
-  ctx.save();
   ctx.clearRect(0, 0, WIDTH, HEIGHT);
-
-  // TODO: move to separate canvas and single step
-  stars.forEach(s=>{
-    ctx.fillStyle = s.color;
-    ctx.fillRect(s.x, s.y, s.size, s.size);
-  });
 
   player.ships.forEach(s=>{
     ctx.fillStyle = 'white';
@@ -74,6 +86,21 @@ function drawFrame(timestamp) {
   requestAnimationFrame(drawFrame);
 }
 
+function generateButtons() {
+  planets.forEach(p=>{
+    const button = $('<div>go</div>').addClass('button');
+    button.css({
+      top: p.y + 'px',
+      left: p.x + 'px'
+    });
+    button.data('planet', p);
+    button.appendTo(container);
+    button.on('click', () => {
+      console.log('button for planet:', p);
+    });
+  });
+}
+
 $(document).ready(function() {
   const canvas = document.getElementById('main-canvas');
   $(canvas).attr('height', HEIGHT);
@@ -81,6 +108,7 @@ $(document).ready(function() {
 
   ctx = canvas.getContext('2d');
 
+  container = $(document.getElementById('overlay-container'));
   debugLog = $(document.getElementById('debug-log'));
 
   ctx.fillStyle = '#88DD88';
@@ -89,5 +117,6 @@ $(document).ready(function() {
 
   // blast off
   generateStarfield();
+  generateButtons();
   drawFrame(0);
 });
