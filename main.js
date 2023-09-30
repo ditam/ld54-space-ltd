@@ -46,6 +46,80 @@ function generateStarfield() {
   });
 }
 
+let _floaterVisible = false;
+function attachCargoToCursor(cargo) {
+  floater.empty();
+  floater.show();
+  _floaterVisible = true;
+  const table = getCargoDOM(cargo);
+  table.appendTo(floater);
+  floater.appendTo(container);
+}
+
+function dropCargoFromCursor(cargo, clickEvent) {
+  floater.hide();
+  _floaterVisible = false;
+  console.log('dropped:', cargo);
+}
+
+function getCargoDOM(cargo) {
+  console.assert(Array.isArray(cargo));
+  const table = $('<div></div>').addClass('table');
+  for (let i=0; i<4; i++) {
+    let row = $('<div></div>').addClass('row');
+    for (let j=0; j<4; j++) {
+      let cell = $('<div></div>').addClass('cell');
+      // TODO: display at minimum necessary size
+      if (cargo[i] && cargo[i][j] === 1) {
+        cell.addClass('filled');
+      }
+      cell.appendTo(row);
+    }
+    row.appendTo(table);
+  }
+  return table;
+}
+
+function generateDOM() {
+  planets.forEach(p=>{
+    // generate buttons
+    const button = $('<div>go</div>').addClass('button');
+    button.css({
+      top: p.y + 'px',
+      left: p.x + 'px'
+    });
+    button.data('planet', p);
+    button.appendTo(container);
+    button.on('click', () => {
+      player.ships[0].target = p;
+    });
+    // generate inventory
+    const inventory = $('<div></div>').addClass('inventory');
+    inventory.css({
+      top: p.y + 30 + 'px',
+      left: p.x + 30 + 'px'
+    });
+    $('<div>header</div>').appendTo(inventory);
+
+    // TODO: support multiple contracts
+    const table = getCargoDOM(p.contracts[0].cargo);
+    table.appendTo(inventory);
+    table.on('click', ()=>{
+      console.log('picking up:', p.contracts[0].cargo);
+      attachCargoToCursor(p.contracts[0].cargo);
+    });
+
+    const dropzone = $('<div></div>').addClass('dropzone');
+    dropzone.appendTo(inventory);
+    dropzone.on('click', (event)=>{
+      dropCargoFromCursor(p.contracts[0].cargo, event);
+    });
+
+    inventory.appendTo(container);
+    // TODO: hide by default
+  });
+}
+
 const player = {
   ships: [{
     x: 300,
@@ -62,14 +136,37 @@ const planets = [
   {
     name: 'P1',
     x: 1500,
-    y: 300
+    y: 300,
+    contracts: [{
+      price: 500,
+      cargo: [
+        [0, 0, 1],
+        [0, 0, 1],
+        [0, 1, 1]
+      ]
+    }]
   },
   {
     name: 'P2',
     x: 500,
-    y: 800
+    y: 800,
+    contracts: [{
+      price: 100,
+      cargo: [
+        [1, 1],
+        [1, 1]
+      ]
+    }]
   }
 ];
+
+let cargoShown = false;
+function showCargoAtPlanet(planet) {
+  if (!cargoShown) {
+    console.log('cargo at planet:', planet.name);
+    cargoShown = true;
+  }
+}
 
 function drawFrame(timestamp) {
   ctx.clearRect(0, 0, WIDTH, HEIGHT);
@@ -95,6 +192,8 @@ function drawFrame(timestamp) {
       if (dist > INTERACTION_SIZE) {
         s.x += dX * BASE_SPEED;
         s.y += dY * BASE_SPEED;
+      } else {
+        showCargoAtPlanet(s.target);
       }
     }
 
@@ -106,22 +205,6 @@ function drawFrame(timestamp) {
   requestAnimationFrame(drawFrame);
 }
 
-function generateButtons() {
-  planets.forEach(p=>{
-    const button = $('<div>go</div>').addClass('button');
-    button.css({
-      top: p.y + 'px',
-      left: p.x + 'px'
-    });
-    button.data('planet', p);
-    button.appendTo(container);
-    button.on('click', () => {
-      console.log('button for planet:', p);
-      player.ships[0].target = {x: p.x, y: p.y};
-    });
-  });
-}
-
 $(document).ready(function() {
   const canvas = document.getElementById('main-canvas');
   $(canvas).attr('height', HEIGHT);
@@ -131,13 +214,24 @@ $(document).ready(function() {
 
   container = $(document.getElementById('overlay-container'));
   debugLog = $(document.getElementById('debug-log'));
+  floater = $(document.getElementById('floater'));
 
   ctx.fillStyle = '#88DD88';
   ctx.strokeStyle = 'black';
   ctx.lineWidth = 1;
 
+  // attach mouse events
+  document.addEventListener('mousemove', function(event){
+    if (_floaterVisible) {
+      floater.css({
+        top: event.clientY + 10 + 'px',
+        left: event.clientX + 10 + 'px'
+      });
+    }
+  }, false);
+
   // blast off
   generateStarfield();
-  generateButtons();
+  generateDOM();
   drawFrame(0);
 });
