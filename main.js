@@ -77,6 +77,7 @@ function drawFrame(timestamp) {
   // draw planets
   planets.forEach(p=>{
     ctx.fillStyle = 'brown';
+    ctx.beginPath();
     ctx.arc(p.x, p.y, 50, 0, 2*Math.PI);
     ctx.fill();
   });
