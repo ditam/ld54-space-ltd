@@ -55,10 +55,10 @@ function generateStarfield() {
 
 let _floaterVisible = false;
 let draggedItem = null;
-function attachItemToCursor(contract) {
+function attachItemToCursor(sourcePlanet, contract) {
   console.assert(Array.isArray(contract.cargo));
   draggedItem = deepCopy(contract);
-  // TODO: register where item was picked from - so we know what to remove
+  draggedItem.source = sourcePlanet;
   floater.empty();
   body.addClass('dragging');
   _floaterVisible = true;
@@ -104,6 +104,11 @@ function dropItemFromCursor(ship, coords) {
 
   let cargoFits = true;
   // We check if the cargo fits
+  // - validate that it is at the right planet
+  if (!ship.inOrbitAt || ship.inOrbitAt !== draggedItem.source) {
+    console.log('Invalid target: ship not at source planet!');
+    cargoFits = false;
+  }
   // - check bounds size
   const draggedItemWidth = draggedItem.cargo[0].length;
   const draggedItemHeight = draggedItem.cargo.length;
@@ -115,7 +120,6 @@ function dropItemFromCursor(ship, coords) {
     console.log('width clash', j0, draggedItemWidth, ship.cargo[0].length);
     cargoFits = false;
   }
-
   // - check every cell if not yet filled
   for (let i=0; i<draggedItem.cargo.length; i++) {
     for (let j=0; j<draggedItem.cargo[i].length; j++) {
@@ -127,6 +131,8 @@ function dropItemFromCursor(ship, coords) {
   }
 
   if (!cargoFits) {
+    // TODO: play error sound
+    // TODO: display error message somewhere
     console.log('NO FIT - TODO: play error sound');
   } else {
     // if we fit, we add the item and recalculate the cargo layout
@@ -214,7 +220,7 @@ function generateDOM() {
     table.appendTo(planetInventory);
     table.on('click', ()=>{
       console.log('picking up:', p.contracts[0]);
-      attachItemToCursor(p.contracts[0]);
+      attachItemToCursor(p, p.contracts[0]);
     });
 
     const shipInventory = $('<div></div>').addClass(['inventory', 'ships']);
