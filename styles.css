@@ -38,18 +38,19 @@ canvas {
 }
 
 .table .row {
-  line-height: 10px; /* match to cell size */
+  line-height: 10px; /* smaller than cell size to avoid gaps */
 }
 
 .table .cell {
   display: inline-block;
-  width: 10px;
-  height: 10px;
-  border: 1px solid gray;
+  width: 20px;
+  height: 20px;
+  border: 1px solid rgba(128, 128, 128, 0.215);
+  margin: 1px;
 }
 
 .table .cell.filled {
-  background-color:rgb(50, 50, 100)
+  background-color:rgb(86, 220, 159)
 }
 
 .inventory .dropzone {
@@ -66,6 +67,17 @@ canvas {
 
 .floater {
   position: absolute;
-  background: rgba(255, 255, 255, 0.3);
+  background: transparent;
   display: none; /* toggled from JS */
+}
+
+.floater .table .cell {
+  border: none;
+}
+
+.floater .table .cell.filled {
+  background-color:rgb(86, 220, 159);
+  /* match sizing of locked cargo cells: */
+  margin: 1px;
+  border: 1px transparent;
 }

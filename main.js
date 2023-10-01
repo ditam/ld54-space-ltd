@@ -13,6 +13,9 @@ function getRandomInt(min, max) { // min and max included
   }
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
+function deepCopy(o) {
+  return JSON.parse(JSON.stringify(o));
+}
 
 let DEBUG = location && location.hostname==='localhost';
 
@@ -47,18 +50,49 @@ function generateStarfield() {
 }
 
 let _floaterVisible = false;
+let floatingCargo = null;
 function attachCargoToCursor(cargo) {
+  console.assert(Array.isArray(cargo));
+  floatingCargo = deepCopy(cargo);
+  // TODO: register where cargo was picked from - so we know what to remove
   floater.empty();
-  floater.show();
   _floaterVisible = true;
   const table = getCargoDOM(cargo);
   table.appendTo(floater);
   floater.appendTo(container);
+  floater.show();
+}
+
+function rotateFloatingCargo() {
+  // rotate layout
+  const oldCargo = deepCopy(floatingCargo);
+  const oldRowCount = oldCargo.length;
+  const oldColCount = oldCargo[0].length;
+  const rowCount = oldColCount;
+  const colCount = oldRowCount;
+  const newCargo = [];
+  // we rotate by transposing then reversing rows
+  for (let i=0; i<rowCount; i++) {
+    newCargo.push([]);
+    for (let j=0; j<colCount; j++) {
+      newCargo[i][j] = oldCargo[j][i];
+    }
+  }
+  for (let i=0; i<rowCount; i++) {
+    newCargo[i].reverse();
+  }
+  floatingCargo = newCargo;
+  // redraw floater
+  floater.empty();
+  const table = getCargoDOM(floatingCargo);
+  table.appendTo(floater);
 }
 
 function dropCargoFromCursor(cargo, clickEvent) {
   floater.hide();
   _floaterVisible = false;
+  // TODO: register dropped floatingCargo
+  floatingCargo = null;
   console.log('dropped:', cargo);
 }
 
@@ -229,6 +263,15 @@ $(document).ready(function() {
       });
     }
   }, false);
+
+  document.addEventListener('contextmenu', function(event) {
+    if (event.button === 2) { // right click
+      event.preventDefault(); // disable context menu
+      if (_floaterVisible) {
+        rotateFloatingCargo();
+      }
+    }
+  });
 
   // blast off
   generateStarfield();
