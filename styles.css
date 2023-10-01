@@ -13,6 +13,11 @@ canvas {
   top: 1080px;
 }
 
+#score-counter {
+  position: absolute;
+  top: 1110px;
+}
+
 #backdrop {
   position: absolute;
   width: 1920px;

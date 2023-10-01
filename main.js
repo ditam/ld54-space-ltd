@@ -30,6 +30,7 @@ const planets = [
 ];
 
 const player = {
+  score: 0, // aka money
   ships: [{
     name: 'SLC Manaca',
     x: 300,
@@ -53,6 +54,25 @@ const player = {
     target: planets[1]
   }]
 };
+
+function checkDeliveriesAtPlanet(ship, planet) {
+  console.assert(ship.inOrbitAt === planet);
+  ship.items.forEach(item => {
+    if (item.destination === planet.name) {
+      item.toBeDeleted = true;
+      player.score += item.price;
+      updateScore();
+      console.log('delivered item, credited:', item.price);
+    }
+  });
+  for (let i=ship.items.length-1; i>=0; i--) {
+    if (ship.items[i].toBeDeleted) {
+      ship.items.splice(i, 1);
+      console.log('removing delivered item from cargo');
+    }
+  }
+  recalculateCargoSpace(ship);
+}
 
 function showInventoryAtPlanet(planet) {
   console.log('inventory at planet:', planet.name);
@@ -133,6 +153,7 @@ function drawFrame(timestamp) {
         if (s.inOrbitAt !== s.target) {
           newOrbitData = true;
           s.inOrbitAt = s.target;
+          checkDeliveriesAtPlanet(s, s.target);
           showInventoryAtPlanet(s.target);
         }
       }
@@ -162,6 +183,7 @@ $(document).ready(function() {
   container = $(document.getElementById('overlay-container'));
   debugLog = $(document.getElementById('debug-log'));
   floater = $(document.getElementById('floater'));
+  scoreCounter = $(document.getElementById('score-counter'));
 
   ctx.fillStyle = '#88DD88';
   ctx.strokeStyle = 'black';
@@ -190,6 +212,7 @@ $(document).ready(function() {
 
   // blast off
   generateStarfield();
+  updateScore();
   generateDOM();
   drawFrame(0);
 });

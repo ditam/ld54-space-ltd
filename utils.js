@@ -21,7 +21,7 @@ function deepCopy(o) {
 
 let DEBUG = location && location.hostname==='localhost';
 
-let body, container, ctx, debugLog;
+let body, container, ctx, debugLog, scoreCounter;
 
 let startfieldInitialized = false;
 function generateStarfield() {
@@ -51,6 +51,10 @@ function generateStarfield() {
     sfCtx.fillStyle = s.color;
     sfCtx.fillRect(s.x, s.y, s.size, s.size);
   });
+}
+
+function updateScore() {
+  scoreCounter.text('$'+player.score);
 }
 
 let _floaterVisible = false;
@@ -139,7 +143,9 @@ function dropItemFromCursor(ship, coords) {
     ship.items.push({
       i0: i0,
       j0: j0,
-      cells: deepCopy(draggedItem.cargo)
+      cells: deepCopy(draggedItem.cargo),
+      destination: draggedItem.destination,
+      price: draggedItem.price
     });
     recalculateCargoSpace(ship);
     // update displays
