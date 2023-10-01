@@ -55,7 +55,12 @@ canvas {
 }
 
 .table .cell.filled {
-  background-color:rgb(86, 220, 159)
+  background-color:rgb(86, 220, 159);
+}
+
+body.dragging .inventory.ships .table .cell:hover {
+  cursor: pointer;
+  background-color: rgb(179, 186, 183);
 }
 
 .floater {

@@ -58,6 +58,10 @@ function attachCargoToCursor(cargo) {
   floater.empty();
   body.addClass('dragging');
   _floaterVisible = true;
+  floater.css({
+    top: mouseY + 10 + 'px',
+    left: mouseX + 10 + 'px'
+  });
   const table = getCargoDOM(cargo);
   table.appendTo(floater);
   floater.appendTo(container);
@@ -310,6 +314,8 @@ function drawFrame(timestamp) {
   requestAnimationFrame(drawFrame);
 }
 
+let mouseX = 0;
+let mouseY = 0;
 $(document).ready(function() {
   const canvas = document.getElementById('main-canvas');
   $(canvas).attr('height', HEIGHT);
@@ -328,10 +334,12 @@ $(document).ready(function() {
 
   // attach mouse events
   document.addEventListener('mousemove', function(event){
+    mouseX = event.clientX;
+    mouseY = event.clientY;
     if (_floaterVisible) {
       floater.css({
-        top: event.clientY + 10 + 'px',
-        left: event.clientX + 10 + 'px'
+        top: mouseY + 10 + 'px',
+        left: mouseX + 10 + 'px'
       });
     }
   }, false);
