@@ -1,6 +1,6 @@
 WIDTH = 1920;
 HEIGHT = 1080;
-BASE_SPEED = 4;
+BASE_SPEED = 6;
 ORBIT_DIST = 50;
 
 function getRandomItem(array) {
@@ -99,27 +99,71 @@ function dropCargoFromCursor(ship, coords) {
   const i0 = coords.i;
   const j0 = coords.j;
   console.log('dropping cargo:', floatingCargo);
-  // TODO: check if fits
-  // - check bounds size
-  // - check every cell if not yet filled
 
-  // apply dropped item to ship cargo
+  let cargoFits = true;
+  // We check if the cargo fits
+  // - check bounds size
+  const floatingCargoWidth = floatingCargo[0].length;
+  const floatingCargoHeight = floatingCargo.length;
+  if ((i0 + floatingCargoHeight -1) >= ship.cargo.length ) {
+    console.log('height clash', i0, floatingCargoHeight, ship.cargo.length);
+    cargoFits = false;
+  }
+  if ((j0 + floatingCargoWidth -1) >= ship.cargo[0].length) {
+    console.log('width clash', j0, floatingCargoWidth, ship.cargo[0].length);
+    cargoFits = false;
+  }
+
+  // - check every cell if not yet filled
   for (let i=0; i<floatingCargo.length; i++) {
     for (let j=0; j<floatingCargo[i].length; j++) {
-      if (floatingCargo[i][j]) {
-        ship.cargo[i0 + i][j0 + j] = floatingCargo[i][j];
+      if (ship.cargo[i0 + i] && ship.cargo[i0 + i][j0 + j] && floatingCargo[i][j]) {
+        console.log('clash with existing cargo at:', i0 + i, j0 + j, i, j);
+        cargoFits = false;
       }
     }
   }
 
-  // update displays
-  updateOrbitInfo();
+  if (!cargoFits) {
+    console.log('NO FIT - TODO: play error sound');
+  } else {
+    // if we fit, we add the item and recalculate the cargo layout
+    ship.items.push({
+      i0: i0,
+      j0: j0,
+      cells: deepCopy(floatingCargo)
+    });
+    recalculateCargoSpace(ship);
+    // update displays
+    updateOrbitInfo();
+  }
 
-  // exit dragging mode
+  // exit dragging mode - even if it didnt fit
   floater.hide();
   body.removeClass('dragging');
   _floaterVisible = false;
   floatingCargo = null;
+}
+
+function recalculateCargoSpace(ship) {
+  // empty old cargo, keeping the size
+  for (let i=0; i<ship.cargo.length; i++) {
+    for (let j=0; j<ship.cargo[i].length; j++) {
+      ship.cargo[i][j] = 0;
+    }
+  }
+  ship.items.forEach(item=>{
+    const i0 = item.i0;
+    const j0 = item.j0;
+    for (let i=0; i<item.cells.length; i++) {
+      for (let j=0; j<item.cells[i].length; j++) {
+        if (item.cells[i][j]) {
+          console.assert(ship.cargo[i0+i][j0+j] === 0, 'Unexpected filled cargo cell at', i0+i, j0+j);
+          ship.cargo[i0+i][j0+j] = item.cells[i][j];
+        }
+      }
+    }
+  });
 }
 
 function getCargoDOM(cargo) {
@@ -131,8 +175,9 @@ function getCargoDOM(cargo) {
       let cell = $('<div></div>').addClass('cell');
       cell.data('coords', {i: i, j: j});
       // TODO: display at minimum necessary size
-      if (cargo[i] && cargo[i][j] === 1) {
+      if (cargo[i] && cargo[i][j]) {
         cell.addClass('filled');
+        cell.addClass('color'+cargo[i][j]);
       }
       cell.appendTo(row);
     }
@@ -216,8 +261,8 @@ const planets = [
     contracts: [{
       price: 100,
       cargo: [
-        [1, 1],
-        [1, 1]
+        [2, 2],
+        [2, 2]
       ]
     }]
   }
@@ -227,12 +272,13 @@ const player = {
   ships: [{
     name: 'SLC Manaca',
     x: 300,
-    y: 400,
+    y: 450,
     cargo: [
       [0, 0, 0],
       [0, 0, 0],
-      [0, 0, 1]
-    ]
+      [0, 0, 0]
+    ],
+    items: []
   },
   {
     name: 'SLC Debugio',
@@ -242,6 +288,7 @@ const player = {
       [0, 0],
       [0, 0]
     ],
+    items: [],
     target: planets[1]
   }]
 };
