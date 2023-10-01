@@ -29,6 +29,11 @@ canvas {
   background: linear-gradient(135deg, rgb(6, 44, 50) -40%, rgb(3, 0, 37) 100%);
 }
 
+#hud {
+  position: absolute;
+  background-color: white;
+}
+
 .button {
   position: absolute;
   cursor: pointer;

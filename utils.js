@@ -27,7 +27,7 @@ function deepCopy(o) {
 
 let DEBUG = location && location.hostname==='localhost';
 
-let body, container, ctx, debugLog, scoreCounter;
+let body, container, ctx, debugLog, scoreCounter, shipList;
 
 let startfieldInitialized = false;
 function generateStarfield() {
@@ -61,6 +61,20 @@ function generateStarfield() {
 
 function updateScore() {
   scoreCounter.text('$'+player.score);
+}
+
+function updateShipList() {
+  let shipNames = '';
+  player.ships.forEach((ship, i) => {
+    shipNames += ship.name;
+    if (i === activeShipIndex) {
+      shipNames += ' (active)';
+    }
+    if (i < player.ships.length-1) {
+      shipNames += ', ';
+    }
+  });
+  shipList.text(shipNames);
 }
 
 let _floaterVisible = false;
@@ -234,7 +248,7 @@ function generatePlanetInfoPanels() {
     button.data('planet', p);
     button.appendTo(container);
     button.on('click', () => {
-      player.ships[0].target = p;
+      player.ships[activeShipIndex].target = p;
     });
     // generate inventory
     const planetInventory = $('<div></div>').addClass(['inventory', 'planet']);

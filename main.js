@@ -1,4 +1,5 @@
 
+let activeShipIndex = 0;
 const planets = [
   {
     name: 'P1',
@@ -130,7 +131,7 @@ function updateOrbitInfo() {
 }
 
 function _getDebugLog(){
-  let shipData = deepCopy(player.ships[0]);
+  let shipData = deepCopy(player.ships[activeShipIndex]);
   shipData.x = Math.round(shipData.x);
   shipData.y = Math.round(shipData.y);
   return JSON.stringify(shipData);
@@ -204,6 +205,7 @@ $(document).ready(function() {
   debugLog = $(document.getElementById('debug-log'));
   floater = $(document.getElementById('floater'));
   scoreCounter = $(document.getElementById('score-counter'));
+  shipList = $(document.getElementById('ship-list'));
 
   ctx.fillStyle = '#88DD88';
   ctx.strokeStyle = 'black';
@@ -230,9 +232,22 @@ $(document).ready(function() {
     }
   });
 
+  document.addEventListener('keydown', function(event) {
+    if (event.key === '1') {
+      activeShipIndex = 0;
+      updateShipList();
+    }
+    // TODO: block if ship count < 2
+    if (event.key === '2') {
+      activeShipIndex = 1;
+      updateShipList();
+    }
+  });
+
   // blast off
   generateStarfield();
   updateScore();
+  updateShipList();
   generatePlanetInfoPanels();
   drawFrame(0);
 });
