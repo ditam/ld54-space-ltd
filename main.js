@@ -5,12 +5,31 @@ const planets = [
     x: 1500,
     y: 300,
     contracts: [{
+      contractID: getNewID(),
       price: 500,
       destination: 'P2',
       cargo: [
         [0, 1],
         [0, 1],
         [1, 1]
+      ]
+    }, {
+      contractID: getNewID(),
+      price: 120,
+      destination: 'P2',
+      cargo: [
+        [2, 2],
+        [0, 2],
+        [2, 2]
+      ]
+    }, {
+      contractID: getNewID(),
+      price: 800,
+      destination: 'P3',
+      cargo: [
+        [0, 4],
+        [4, 4],
+        [4, 0]
       ]
     }]
   },
@@ -19,6 +38,7 @@ const planets = [
     x: 500,
     y: 800,
     contracts: [{
+      contractID: getNewID(),
       price: 100,
       destination: 'P1',
       cargo: [
@@ -213,6 +233,6 @@ $(document).ready(function() {
   // blast off
   generateStarfield();
   updateScore();
-  generateDOM();
+  generatePlanetInfoPanels();
   drawFrame(0);
 });

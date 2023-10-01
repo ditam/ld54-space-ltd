@@ -5,6 +5,12 @@ HEIGHT = 1080;
 BASE_SPEED = 6;
 ORBIT_DIST = 50;
 
+let _idCounter = 0;
+function getNewID() {
+  _idCounter++;
+  return 'id' + _idCounter;
+}
+
 function getRandomItem(array) {
   return array[Math.floor(Math.random() * array.length)];
 }
@@ -139,7 +145,11 @@ function dropItemFromCursor(ship, coords) {
     // TODO: display error message somewhere
     console.log('NO FIT - TODO: play error sound');
   } else {
-    // if we fit, we add the item and recalculate the cargo layout
+    // remove item from planet contracts
+    const contractIndex = draggedItem.source.contracts.findIndex(c=>c.contractID === draggedItem.contractID);
+    draggedItem.source.contracts.splice(contractIndex, 1);
+    refreshPlanetContracts(draggedItem.source.contractsContainer, draggedItem.source);
+    // add item to ship cargo
     ship.items.push({
       i0: i0,
       j0: j0,
@@ -200,7 +210,20 @@ function getCargoDOM(cargo) {
   return table;
 }
 
-function generateDOM() {
+function refreshPlanetContracts(container, planet) {
+  container.empty();
+  planet.contracts.forEach(contract => {
+    // TODO: displays contract destination and price
+    const table = getCargoDOM(contract.cargo);
+    table.appendTo(container);
+    table.on('click', ()=>{
+      console.log('picking up:', contract);
+      attachItemToCursor(planet, contract);
+    });
+  });
+}
+
+function generatePlanetInfoPanels() {
   planets.forEach(p=>{
     // generate buttons
     const button = $('<div>go</div>').addClass('button');
@@ -214,20 +237,17 @@ function generateDOM() {
       player.ships[0].target = p;
     });
     // generate inventory
-    const planetInventory = $('<div></div>').addClass('inventory');
+    const planetInventory = $('<div></div>').addClass(['inventory', 'planet']);
     planetInventory.css({
       top: p.y - 30 + 'px',
       left: p.x - 180 + 'px'
     });
-    const planetHeader = $('<div></div>').text(p.name).appendTo(planetInventory);
+    $('<div></div>').text(p.name).appendTo(planetInventory);
 
-    // TODO: support multiple contracts
-    const table = getCargoDOM(p.contracts[0].cargo);
-    table.appendTo(planetInventory);
-    table.on('click', ()=>{
-      console.log('picking up:', p.contracts[0]);
-      attachItemToCursor(p, p.contracts[0]);
-    });
+    const contractsContainer = $('<div></div>').addClass('container').appendTo(planetInventory);
+    refreshPlanetContracts(contractsContainer, p);
+    p.contractsContainer = contractsContainer; // save DOM reference to planet object
+    contractsContainer.appendTo(planetInventory);
 
     const shipInventory = $('<div></div>').addClass(['inventory', 'ships']);
     shipInventory.data('planet', p);
