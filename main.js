@@ -1,7 +1,7 @@
 WIDTH = 1920;
 HEIGHT = 1080;
 BASE_SPEED = 4;
-INTERACTION_SIZE = 50;
+ORBIT_DIST = 50;
 
 function getRandomItem(array) {
   return array[Math.floor(Math.random() * array.length)];
@@ -19,7 +19,7 @@ function deepCopy(o) {
 
 let DEBUG = location && location.hostname==='localhost';
 
-let container, ctx, debugLog;
+let body, container, ctx, debugLog;
 
 function generateStarfield() {
   console.log('starfield init');
@@ -56,6 +56,7 @@ function attachCargoToCursor(cargo) {
   floatingCargo = deepCopy(cargo);
   // TODO: register where cargo was picked from - so we know what to remove
   floater.empty();
+  body.addClass('dragging');
   _floaterVisible = true;
   const table = getCargoDOM(cargo);
   table.appendTo(floater);
@@ -90,18 +91,19 @@ function rotateFloatingCargo() {
 
 function dropCargoFromCursor(cargo, clickEvent) {
   floater.hide();
+  body.removeClass('dragging');
   _floaterVisible = false;
-  // TODO: register dropped floatingCargo
   floatingCargo = null;
+  // TODO: register dropped floatingCargo
   console.log('dropped:', cargo);
 }
 
 function getCargoDOM(cargo) {
   console.assert(Array.isArray(cargo));
   const table = $('<div></div>').addClass('table');
-  for (let i=0; i<4; i++) {
+  for (let i=0; i<cargo.length; i++) {
     let row = $('<div></div>').addClass('row');
-    for (let j=0; j<4; j++) {
+    for (let j=0; j<cargo[0].length; j++) {
       let cell = $('<div></div>').addClass('cell');
       // TODO: display at minimum necessary size
       if (cargo[i] && cargo[i][j] === 1) {
@@ -128,43 +130,40 @@ function generateDOM() {
       player.ships[0].target = p;
     });
     // generate inventory
-    const inventory = $('<div></div>').addClass('inventory');
-    inventory.css({
-      top: p.y + 30 + 'px',
-      left: p.x + 30 + 'px'
+    const planetInventory = $('<div></div>').addClass('inventory');
+    planetInventory.css({
+      top: p.y - 30 + 'px',
+      left: p.x - 180 + 'px'
     });
-    $('<div>header</div>').appendTo(inventory);
+    const planetHeader = $('<div></div>').text(p.name).appendTo(planetInventory);
 
     // TODO: support multiple contracts
     const table = getCargoDOM(p.contracts[0].cargo);
-    table.appendTo(inventory);
+    table.appendTo(planetInventory);
     table.on('click', ()=>{
       console.log('picking up:', p.contracts[0].cargo);
       attachCargoToCursor(p.contracts[0].cargo);
     });
 
-    const dropzone = $('<div></div>').addClass('dropzone');
-    dropzone.appendTo(inventory);
-    dropzone.on('click', (event)=>{
+    const shipInventory = $('<div></div>').addClass(['inventory', 'ships']);
+    shipInventory.data('planet', p);
+    shipInventory.on('click', (event)=>{
       dropCargoFromCursor(p.contracts[0].cargo, event);
     });
+    const shipHeader = $('<div></div>').addClass('header').appendTo(shipInventory);
+    shipHeader.text('No ships in orbit.');
+    $('<div></div>').addClass('container').appendTo(shipInventory); // ship cargo will appear here
 
-    inventory.appendTo(container);
+    shipInventory.css({
+      top: p.y - 30 + 'px',
+      left: p.x + 60 + 'px'
+    });
+
+    planetInventory.appendTo(container);
+    shipInventory.appendTo(container);
     // TODO: hide by default
   });
 }
-
-const player = {
-  ships: [{
-    x: 300,
-    y: 400,
-    cargo: [
-      [0, 0, 0],
-      [0, 0, 0],
-      [0, 0, 0]
-    ]
-  }]
-};
 
 const planets = [
   {
@@ -174,9 +173,9 @@ const planets = [
     contracts: [{
       price: 500,
       cargo: [
-        [0, 0, 1],
-        [0, 0, 1],
-        [0, 1, 1]
+        [0, 1],
+        [0, 1],
+        [1, 1]
       ]
     }]
   },
@@ -194,16 +193,76 @@ const planets = [
   }
 ];
 
-let cargoShown = false;
-function showCargoAtPlanet(planet) {
-  if (!cargoShown) {
-    console.log('cargo at planet:', planet.name);
-    cargoShown = true;
-  }
+const player = {
+  ships: [{
+    name: 'SLC Manaca',
+    x: 300,
+    y: 400,
+    cargo: [
+      [0, 0, 0],
+      [0, 0, 0],
+      [0, 0, 1]
+    ]
+  },
+  {
+    name: 'SLC Debugio',
+    x: 500,
+    y: 800,
+    cargo: [
+      [0, 0],
+      [0, 0]
+    ],
+    target: planets[1]
+  }]
+};
+
+function showInventoryAtPlanet(planet) {
+  console.log('inventory at planet:', planet.name);
+}
+
+function updateOrbitInfo() {
+  console.log('--orbits update--');
+  const shipInventories = $('.inventory.ships');
+  shipInventories.each((_i, _el) => {
+    const el = $(_el);
+    const planet = el.data('planet');
+    console.log('ship inv at planet:', planet);
+    const shipsAtPlanet = player.ships.filter(s=>s.inOrbitAt === planet);
+    let headerText = '';
+    if (shipsAtPlanet.length === 0) {
+      headerText = 'No ships in orbit.';
+    } else if (shipsAtPlanet.length === 1) {
+      headerText = shipsAtPlanet[0].name + ' is in orbit.';
+    } else {
+      headerText = shipsAtPlanet.length + ' ships in orbit.';
+    }
+    el.find('.header').text(headerText);
+    const container = el.find('.container');
+    // TODO: this is all very wasteful. We should just generate off-screen
+    // the cargo view, and move it to the planet where the ship is.
+    container.empty();
+    shipsAtPlanet.forEach(s=>{
+      if (shipsAtPlanet.length > 1) {
+        $(`<div>${s.name}</div>`).addClass('name').appendTo(container);
+      }
+      container.append(getCargoDOM(s.cargo));
+    });
+  });
+}
+
+function _getDebugLog(){
+  let shipData = deepCopy(player.ships[0]);
+  shipData.x = Math.round(shipData.x);
+  shipData.y = Math.round(shipData.y);
+  return JSON.stringify(shipData);
 }
 
 function drawFrame(timestamp) {
   ctx.clearRect(0, 0, WIDTH, HEIGHT);
+
+  if (DEBUG) {
+    debugLog.text(_getDebugLog());
+  }
 
   // draw planets
   planets.forEach(p=>{
@@ -213,6 +272,7 @@ function drawFrame(timestamp) {
     ctx.fill();
   });
 
+  let newOrbitData = false;
   player.ships.forEach(s=>{
     // move towards target
     if (s.target) {
@@ -223,17 +283,28 @@ function drawFrame(timestamp) {
       // dX/dY is the unit vector pointing at target
       dX = dX / dist;
       dY = dY / dist;
-      if (dist > INTERACTION_SIZE) {
+      if (dist > ORBIT_DIST) {
         s.x += dX * BASE_SPEED;
         s.y += dY * BASE_SPEED;
+        if (s.inOrbitAt) {
+          newOrbitData = true;
+          delete s.inOrbitAt;
+        }
       } else {
-        showCargoAtPlanet(s.target);
+        if (s.inOrbitAt !== s.target) {
+          newOrbitData = true;
+          s.inOrbitAt = s.target;
+          showInventoryAtPlanet(s.target);
+        }
+      }
+      if (newOrbitData) {
+        updateOrbitInfo();
       }
     }
 
     // draw ship
-    ctx.fillStyle = 'white';
-    ctx.fillRect(s.x, s.y, 50, 50);
+    ctx.fillStyle = 'gray';
+    ctx.fillRect(s.x, s.y, 40, 40);
   });
 
   requestAnimationFrame(drawFrame);
@@ -246,6 +317,7 @@ $(document).ready(function() {
 
   ctx = canvas.getContext('2d');
 
+  body = $('body');
   container = $(document.getElementById('overlay-container'));
   debugLog = $(document.getElementById('debug-log'));
   floater = $(document.getElementById('floater'));

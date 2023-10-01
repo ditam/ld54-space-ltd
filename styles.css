@@ -8,6 +8,11 @@ canvas {
   left: 0;
 }
 
+#debug-log {
+  position: absolute;
+  top: 1080px;
+}
+
 #backdrop {
   position: absolute;
   width: 1920px;
@@ -53,18 +58,6 @@ canvas {
   background-color:rgb(86, 220, 159)
 }
 
-.inventory .dropzone {
-  height: 15px;
-  cursor: pointer;
-  border: 1px solid gray;
-  background-color: gray;
-}
-
-.inventory .dropzone:hover {
-  border: 1px solid black;
-  background-color: rgb(80, 80, 80);
-}
-
 .floater {
   position: absolute;
   background: transparent;
@@ -81,3 +74,4 @@ canvas {
   margin: 1px;
   border: 1px transparent;
 }
+
