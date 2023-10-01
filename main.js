@@ -21,8 +21,10 @@ let DEBUG = location && location.hostname==='localhost';
 
 let body, container, ctx, debugLog;
 
+let startfieldInitialized = false;
 function generateStarfield() {
-  console.log('starfield init');
+  console.assert(!startfieldInitialized, 'starfield already initialized');
+  startfieldInitialized = true;
   const stars = [];
   for (let i=0; i<1000; i++) {
     const b = getRandomInt(0, 255); // brightness
@@ -93,13 +95,31 @@ function rotateFloatingCargo() {
   table.appendTo(floater);
 }
 
-function dropCargoFromCursor(cargo, clickEvent) {
+function dropCargoFromCursor(ship, coords) {
+  const i0 = coords.i;
+  const j0 = coords.j;
+  console.log('dropping cargo:', floatingCargo);
+  // TODO: check if fits
+  // - check bounds size
+  // - check every cell if not yet filled
+
+  // apply dropped item to ship cargo
+  for (let i=0; i<floatingCargo.length; i++) {
+    for (let j=0; j<floatingCargo[i].length; j++) {
+      if (floatingCargo[i][j]) {
+        ship.cargo[i0 + i][j0 + j] = floatingCargo[i][j];
+      }
+    }
+  }
+
+  // update displays
+  updateOrbitInfo();
+
+  // exit dragging mode
   floater.hide();
   body.removeClass('dragging');
   _floaterVisible = false;
   floatingCargo = null;
-  // TODO: register dropped floatingCargo
-  console.log('dropped:', cargo);
 }
 
 function getCargoDOM(cargo) {
@@ -109,6 +129,7 @@ function getCargoDOM(cargo) {
     let row = $('<div></div>').addClass('row');
     for (let j=0; j<cargo[0].length; j++) {
       let cell = $('<div></div>').addClass('cell');
+      cell.data('coords', {i: i, j: j});
       // TODO: display at minimum necessary size
       if (cargo[i] && cargo[i][j] === 1) {
         cell.addClass('filled');
@@ -151,8 +172,13 @@ function generateDOM() {
 
     const shipInventory = $('<div></div>').addClass(['inventory', 'ships']);
     shipInventory.data('planet', p);
-    shipInventory.on('click', (event)=>{
-      dropCargoFromCursor(p.contracts[0].cargo, event);
+    shipInventory.on('click', '.cell', (event)=>{
+      const target = $(event.target);
+      const coords = target.data('coords');
+      // first parent is the row, parent of that is the table
+      const ship = target.parent().parent().data('ship');
+      console.log('coords:', coords, 'on ship:', ship);
+      dropCargoFromCursor(ship, coords);
     });
     const shipHeader = $('<div></div>').addClass('header').appendTo(shipInventory);
     shipHeader.text('No ships in orbit.');
@@ -230,7 +256,6 @@ function updateOrbitInfo() {
   shipInventories.each((_i, _el) => {
     const el = $(_el);
     const planet = el.data('planet');
-    console.log('ship inv at planet:', planet);
     const shipsAtPlanet = player.ships.filter(s=>s.inOrbitAt === planet);
     let headerText = '';
     if (shipsAtPlanet.length === 0) {
@@ -249,7 +274,9 @@ function updateOrbitInfo() {
       if (shipsAtPlanet.length > 1) {
         $(`<div>${s.name}</div>`).addClass('name').appendTo(container);
       }
-      container.append(getCargoDOM(s.cargo));
+      const shipCargoDOM = getCargoDOM(s.cargo);
+      shipCargoDOM.data('ship', s);
+      container.append(shipCargoDOM);
     });
   });
 }
