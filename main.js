@@ -143,6 +143,8 @@ function checkDeliveriesAtPlanet(ship, planet) {
       player.score += item.price;
       updateScore();
       console.log('delivered item, credited:', item.price);
+      generateRandomContract();
+      console.log('generated new contract');
     }
   });
   for (let i=ship.items.length-1; i>=0; i--) {

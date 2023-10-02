@@ -221,6 +221,58 @@ function updateShipList() {
   });
 }
 
+function generateRandomContract() {
+  const cargos = [
+    [[1, 1]],
+    [[2, 2]],
+    [[3, 3]],
+    [
+      [3, 3],
+      [3, 3],
+    ],
+    [
+      [1, 1],
+      [1, 1],
+    ],
+    [
+      [1, 1],
+      [0, 1],
+    ],
+    [
+      [1, 1],
+      [0, 1],
+      [0, 1],
+    ],
+    [
+      [3, 3],
+      [3, 0],
+      [3, 0],
+    ],
+    [
+      [2, 0],
+      [2, 2],
+      [2, 0],
+    ],
+    [
+      [4, 0],
+      [4, 4],
+      [0, 4],
+      [0, 4],
+    ],
+  ];
+  const selectedPlanet = getRandomItem(planets);
+  const selectedCargo = getRandomItem(cargos);
+  const selectedTarget = getRandomItem(planets);
+  const price = getRandomItem([50, 120, 200, 250, 300, 500, 600, 850]);
+  selectedPlanet.contracts.push({
+    contractID: getNewID(),
+    price: price,
+    destination: selectedTarget.name,
+    cargo: deepCopy(selectedCargo)
+  });
+  updateOrbitInfo();
+}
+
 let _floaterVisible = false;
 let draggedItem = null;
 function attachItemToCursor(sourcePlanet, contract) {
