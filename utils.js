@@ -156,8 +156,8 @@ function showShipBuyingPanel() {
         buyShipButton.appendTo(shipList);
         updateOrbitInfo();
       } else {
-        console.log('not enough money. TODO: error sound');
-        // TODO: play error sound
+        console.log('not enough money.');
+        errorSound.play();
       }
       msgContainer.remove();
     });
@@ -300,9 +300,9 @@ function dropItemFromCursor(ship, coords) {
   }
 
   if (!cargoFits) {
-    // TODO: play error sound
     // TODO: display error message somewhere
-    console.log('NO FIT - TODO: play error sound');
+    console.log('Error: cargo does not fit.');
+    errorSound.play();
   } else {
     // remove item from planet contracts
     const contractIndex = draggedItem.source.contracts.findIndex(c=>c.contractID === draggedItem.contractID);

@@ -321,9 +321,7 @@ $(document).ready(function() {
 
   // attach mouse events
   const splash = $('#splash');
-  console.log('Splash selected:', splash);
   splash.on('click', function(){
-    console.log('Splash removed.');
     playNextSong();
     splash.remove();
   });
