@@ -285,5 +285,9 @@ function generatePlanetInfoPanels() {
     planetInventory.appendTo(container);
     shipInventory.appendTo(container);
     // TODO: hide by default
+
+    planet2DOM[p.name].dom1 = button;
+    planet2DOM[p.name].dom2 = planetInventory;
+    planet2DOM[p.name].dom3 = shipInventory;
   });
 }

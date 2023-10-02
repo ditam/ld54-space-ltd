@@ -3,8 +3,8 @@ let activeShipIndex = 0;
 const planets = [
   {
     name: 'P1',
-    x: 1500,
-    y: 300,
+    x: 1300,
+    y: 350,
     contracts: [{
       contractID: getNewID(),
       price: 500,
@@ -47,8 +47,22 @@ const planets = [
         [2, 2]
       ]
     }]
+  },  {
+    name: 'P3',
+    type: 'moon',
+    orbitSize: 200,
+    x: 1300,
+    y: 350,
+    contracts: []
   }
 ];
+
+// convenience hashmap for storing a planet's DOM references
+// (storing them on the planet object would make them non-copyable)
+const planet2DOM = {};
+planets.forEach(p=>{
+  planet2DOM[p.name] = {};
+});
 
 const player = {
   score: 0, // aka money
@@ -144,12 +158,36 @@ function drawFrame(timestamp) {
     debugLog.text(_getDebugLog());
   }
 
+  // TODO: make moon-specific with orbit size? Might be too much work
+  const time = timestamp/(50 * 1000);
+  const moonDX = Math.sin(time%2*Math.PI) * 200;
+  const moonDY = Math.cos(time%2*Math.PI) * 200;
+
   // draw planets
   planets.forEach(p=>{
-    ctx.fillStyle = 'brown';
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, 50, 0, 2*Math.PI);
-    ctx.fill();
+    if (p.type === 'moon') {
+      ctx.fillStyle = 'white';
+      ctx.beginPath();
+      ctx.arc(p.x + moonDX, p.y + moonDY, 20, 0, 2*Math.PI);
+      planet2DOM[p.name].dom1.css({
+        top: p.y + moonDY + 'px',
+        left: p.x + moonDX + 'px'
+      });
+      planet2DOM[p.name].dom2.css({
+        top: p.y + moonDY - 30 + 'px',
+        left: p.x + moonDX - 180 + 'px'
+      });
+      planet2DOM[p.name].dom3.css({
+        top: p.y + moonDY - 30 + 'px',
+        left: p.x + moonDX + 60 + 'px'
+      });
+      ctx.fill();
+    } else {
+      ctx.fillStyle = 'brown';
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 50, 0, 2*Math.PI);
+      ctx.fill();
+    }
   });
 
   let newOrbitData = false;
@@ -157,8 +195,14 @@ function drawFrame(timestamp) {
     // move towards target
     if (s.target) {
       let t = s.target;
-      let dX = t.x - s.x;
-      let dY = t.y - s.y;
+      let dX, dY;
+      if (s.target.type === 'moon') {
+        dX = t.x + moonDX - s.x;
+        dY = t.y + moonDY - s.y;
+      } else {
+        dX = t.x - s.x;
+        dY = t.y - s.y;
+      }
       const dist = Math.sqrt(dX*dX + dY*dY);
       // dX/dY is the unit vector pointing at target
       dX = dX / dist;
