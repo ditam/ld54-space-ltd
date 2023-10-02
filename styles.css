@@ -145,6 +145,27 @@ canvas {
   padding: 15px;
 }
 
+.inventory .contract-container {
+  padding-bottom: 5px;
+}
+
+.inventory .table {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.inventory .details-container {
+  display: inline-block;
+  vertical-align: top;
+  padding-left: 5px;
+  font-size: 10px;
+  line-height: 11px;
+}
+
+.inventory .details-container .label{
+  color: rgba(255, 255, 255, 0.5);
+}
+
 .table .row {
   line-height: 10px; /* smaller than cell size to avoid gaps */
 }

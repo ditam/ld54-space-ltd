@@ -369,16 +369,42 @@ function getCargoDOM(cargo) {
   return table;
 }
 
+function getCargoType(cargo) {
+  console.assert(cargo);
+  const typesMap = {
+    1: 'Food',
+    2: 'Equipment',
+    3: 'Materials',
+    4: 'Unknown'
+  }
+  for (let i=0; i<cargo[0].length; i++) {
+    if (cargo[0][i] !== 0) {
+      return typesMap[cargo[0][i]];
+    }
+  }
+  console.assert(false, 'Expected valid cell in first row of cargo');
+}
+
 function refreshPlanetContracts(container, planet) {
   container.empty();
   planet.contracts.forEach(contract => {
-    // TODO: displays contract destination and price
+    const contractContainer = $('<div></div>').addClass('contract-container');
     const table = getCargoDOM(contract.cargo);
-    table.appendTo(container);
+    table.appendTo(contractContainer);
     table.on('click', ()=>{
       console.log('picking up:', contract);
       attachItemToCursor(planet, contract);
     });
+
+    const details = $('<div></div>').addClass('details-container').appendTo(contractContainer);
+    $('<div></div>').addClass('label destination-label').text('Destination:').appendTo(details);
+    $('<div></div>').addClass('destination').text(contract.destination).appendTo(details);
+    $('<div></div>').addClass('label price-label').text('Reward:').appendTo(details);
+    $('<div></div>').addClass('price').text(contract.price).appendTo(details);
+    $('<div></div>').addClass('label type-label').text('Cargo type:').appendTo(details);
+    $('<div></div>').addClass('type').text(getCargoType(contract.cargo)).appendTo(details);
+
+    contractContainer.appendTo(container);
   });
 }
 
@@ -485,7 +511,7 @@ function generatePlanetInfoPanels() {
     const planetInventory = $('<div></div>').addClass(['inventory', 'planet']);
     planetInventory.css({
       top: p.y - 30 + 'px',
-      left: p.x - 180 + 'px'
+      left: p.x - 200 + 'px'
     });
 
     const contractsContainer = $('<div></div>').addClass('container').appendTo(planetInventory);
