@@ -233,8 +233,7 @@ function drawFrame(timestamp) {
           delete s.inOrbitAt;
         }
         // draw ship - ships are only visible en-route to an orbit
-        ctx.fillStyle = 'gray';
-        ctx.fillRect(s.x, s.y, 40, 40);
+        ctx.drawImage(s.image, s.x, s.y, 32, 32);
       } else {
         // at orbit
         if (s.inOrbitAt !== s.target) {
