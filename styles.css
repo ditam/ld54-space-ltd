@@ -12,6 +12,7 @@ canvas {
 #debug-log {
   position: absolute;
   top: 1080px;
+  font-family: monospace;
 }
 
 #score-counter {

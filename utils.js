@@ -237,6 +237,17 @@ function refreshPlanetContracts(container, planet) {
   });
 }
 
+function hidePlanetInfo(planet) {
+  // TODO: override by comlink setting
+  planet2DOM[planet.name].dom2.hide();
+  planet2DOM[planet.name].dom3.hide();
+}
+
+function showPlanetInfo(planet) {
+  planet2DOM[planet.name].dom2.show();
+  planet2DOM[planet.name].dom3.show();
+}
+
 function generatePlanetInfoPanels() {
   planets.forEach(p=>{
     // generate buttons
@@ -284,8 +295,12 @@ function generatePlanetInfoPanels() {
 
     planetInventory.appendTo(container);
     shipInventory.appendTo(container);
-    // TODO: hide by default
 
+    // hide optional panels by default, JS will toggle
+    planetInventory.hide();
+    shipInventory.hide();
+
+    // save shortcuts
     planet2DOM[p.name].dom1 = button;
     planet2DOM[p.name].dom2 = planetInventory;
     planet2DOM[p.name].dom3 = shipInventory;

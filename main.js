@@ -109,10 +109,6 @@ function checkDeliveriesAtPlanet(ship, planet) {
   recalculateCargoSpace(ship);
 }
 
-function showInventoryAtPlanet(planet) {
-  console.log('inventory at planet:', planet.name);
-}
-
 function updateOrbitInfo() {
   console.log('--orbits update--');
   const shipInventories = $('.inventory.ships');
@@ -211,15 +207,18 @@ function drawFrame(timestamp) {
         s.x += dX * BASE_SPEED;
         s.y += dY * BASE_SPEED;
         if (s.inOrbitAt) {
+          // leaving orbit
+          hidePlanetInfo(s.inOrbitAt);
           newOrbitData = true;
           delete s.inOrbitAt;
         }
       } else {
         if (s.inOrbitAt !== s.target) {
+          // entering orbit
+          showPlanetInfo(s.target);
           newOrbitData = true;
           s.inOrbitAt = s.target;
           checkDeliveriesAtPlanet(s, s.target);
-          showInventoryAtPlanet(s.target);
         }
       }
       if (newOrbitData) {
