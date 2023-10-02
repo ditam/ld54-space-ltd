@@ -122,9 +122,10 @@ function rotateDraggedItem() {
 }
 
 function dropItemFromCursor(ship, coords) {
+  console.assert(draggedItem);
+  console.log('dropping item:', draggedItem);
   const i0 = coords.i;
   const j0 = coords.j;
-  console.log('dropping item:', draggedItem);
 
   let cargoFits = true;
   // We check if the cargo fits
@@ -350,11 +351,13 @@ function generatePlanetInfoPanels() {
     const shipInventory = $('<div></div>').addClass(['inventory', 'ships']);
     shipInventory.data('planet', p);
     shipInventory.on('click', '.cell', (event)=>{
+      if (!draggedItem) {
+        return;
+      }
       const target = $(event.target);
       const coords = target.data('coords');
       // first parent is the row, parent of that is the table
       const ship = target.parent().parent().data('ship');
-      console.log('coords:', coords, 'on ship:', ship);
       dropItemFromCursor(ship, coords);
     });
     const shipHeader = $('<div></div>').addClass('header').appendTo(shipInventory);
