@@ -262,6 +262,7 @@ function drawFrame(timestamp) {
 
 let mouseX = 0;
 let mouseY = 0;
+let songs, errorSound;
 $(document).ready(function() {
   const canvas = document.getElementById('main-canvas');
   $(canvas).attr('height', HEIGHT);
@@ -277,7 +278,56 @@ $(document).ready(function() {
   ctx.strokeStyle = 'black';
   ctx.lineWidth = 1;
 
+  // audio assets
+  songs = [
+    new Audio('assets/sounds/bgSong01.mp3')
+  ];
+
+  errorSound = new Audio('assets/sounds/error.mp3');
+
+  const sounds = [
+    errorSound,
+  ];
+
+  let audioLoadCount = 0;
+  $('.loadCountTotal').text(songs.length + sounds.length);
+  function countWhenLoaded(audioElement) {
+    audioElement.addEventListener('canplaythrough', function() {
+      audioLoadCount++;
+      $('.loadCount').text(audioLoadCount);
+    }, false);
+  }
+
+  songs.forEach(countWhenLoaded);
+  sounds.forEach(countWhenLoaded);
+
+  // we add some extra songs to the list - these need not block initial loading
+  songs.push(new Audio('assets/sounds/bgSong02.mp3'));
+  songs.push(new Audio('assets/sounds/bgSong03.mp3'));
+
+  // we set up autoplay so the songs loop
+  songs.forEach(function(song, i) {
+    song.addEventListener('ended', function() {
+      this.currentTime = 0;
+      playNextSong();
+    }, false);
+  });
+
+  let currentSongIndex = -1; // -1 so first call toggles to index 0
+  function playNextSong() {
+    currentSongIndex = (currentSongIndex + 1) % 2;
+    songs[currentSongIndex].play();
+  }
+
   // attach mouse events
+  const splash = $('#splash');
+  console.log('Splash selected:', splash);
+  splash.on('click', function(){
+    console.log('Splash removed.');
+    playNextSong();
+    splash.remove();
+  });
+
   document.addEventListener('mousemove', function(event){
     mouseX = event.clientX;
     mouseY = event.clientY;

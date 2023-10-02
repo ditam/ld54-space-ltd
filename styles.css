@@ -230,3 +230,19 @@ body.dragging .inventory.ships .table .cell:hover {
   cursor: pointer;
   background-color: #8e8d8da8;
 }
+
+#splash {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  text-align: center;
+  background-color: black;
+  z-index: 10;
+}
+
+#splash .message {
+  margin-top: 500px;
+  line-height: 32px;
+}
