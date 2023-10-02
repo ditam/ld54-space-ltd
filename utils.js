@@ -2,7 +2,7 @@
 
 WIDTH = 1920;
 HEIGHT = 1080;
-BASE_SPEED = 6;
+BASE_SPEED = 2;
 ORBIT_DIST = 50;
 
 let _idCounter = 0;
@@ -376,7 +376,7 @@ function getCargoType(cargo) {
     2: 'Equipment',
     3: 'Materials',
     4: 'Unknown'
-  }
+  };
   for (let i=0; i<cargo[0].length; i++) {
     if (cargo[0][i] !== 0) {
       return typesMap[cargo[0][i]];
@@ -510,7 +510,7 @@ function generatePlanetInfoPanels() {
     // generate inventory
     const planetInventory = $('<div></div>').addClass(['inventory', 'planet']);
     planetInventory.css({
-      top: p.y - 30 + 'px',
+      top: p.y - 50 + 'px',
       left: p.x - 200 + 'px'
     });
 
@@ -536,7 +536,7 @@ function generatePlanetInfoPanels() {
     $('<div></div>').addClass('container').appendTo(shipInventory); // ship cargo will appear here
 
     shipInventory.css({
-      top: p.y - 30 + 'px',
+      top: p.y - 50 + 'px',
       left: p.x + 60 + 'px'
     });
 

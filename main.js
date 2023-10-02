@@ -1,10 +1,52 @@
 
 let activeShipIndex = 0;
+
+const colorMap = {
+  brown: '#472b12',
+  red: '#530a1e',
+  yellow: '#6a5108',
+  white: '#62878f',
+  green: '#2e4635'
+};
 const planets = [
   {
+    name: 'Agrigento VI',
+    color: 'red',
+    x: 450,
+    y: 350,
+    size: 50,
+    contracts: [{
+      contractID: getNewID(),
+      price: 100,
+      destination: 'Siracusa III',
+      cargo: [
+        [1, 1],
+        [1, 1]
+      ]
+    }]
+  },
+  {
+    name: 'Trapana IX',
+    color: 'yellow',
+    x: 200,
+    y: 800,
+    size: 45,
+    contracts: [{
+      contractID: getNewID(),
+      price: 100,
+      destination: 'Siracusa III',
+      cargo: [
+        [2, 2],
+        [2, 2]
+      ]
+    }]
+  },
+  {
     name: 'Siracusa III',
+    color: 'brown',
     x: 1300,
     y: 350,
+    size: 40,
     contracts: [{
       contractID: getNewID(),
       price: 500,
@@ -35,26 +77,30 @@ const planets = [
     }]
   },
   {
-    name: 'Agrigento VI',
-    x: 500,
-    y: 800,
+    name: 'Echion',
+    color: 'white',
+    type: 'moon',
+    size: 22,
+    x: 1300,
+    y: 350,
+    contracts: []
+  },
+  {
+    name: 'Enna Minor',
+    color: 'green',
+    x: 1600,
+    y: 750,
+    size: 30,
     contracts: [{
       contractID: getNewID(),
       price: 100,
       destination: 'Siracusa III',
       cargo: [
-        [2, 2],
-        [2, 2]
+        [1, 1],
+        [1, 1]
       ]
     }]
-  },  {
-    name: 'Echion',
-    type: 'moon',
-    orbitSize: 200,
-    x: 1300,
-    y: 350,
-    contracts: []
-  }
+  },
 ];
 
 // convenience hashmap for storing a planet's DOM references
@@ -77,15 +123,15 @@ const player = {
   ships: [{
     name: 'SLC Manaca',
     image: getShipImageClone(0),
-    x: 300,
-    y: 450,
+    x: 400,
+    y: 300,
     cargo: [
       [0, 0, 0],
       [0, 0, 0],
       [0, 0, 0]
     ],
     items: [],
-    target: planets[1]
+    target: planets[0]
   }]
 };
 
@@ -181,13 +227,13 @@ function drawFrame(timestamp) {
 
   // draw planets
   planets.forEach(p=>{
+    ctx.fillStyle = colorMap[p.color];
     if (p.type === 'moon') {
-      ctx.fillStyle = 'white';
       ctx.beginPath();
-      ctx.arc(p.x + moonDX, p.y + moonDY, 20, 0, 2*Math.PI);
+      ctx.arc(p.x + moonDX, p.y + moonDY, p.size, 0, 2*Math.PI);
       planet2DOM[p.name].dom1.css({
         top: p.y + moonDY - 60 + 'px',
-        left: p.x + moonDX - 100 + 'px'
+        left: p.x + moonDX - 80 + 'px'
       });
       planet2DOM[p.name].dom2.css({
         top: p.y + moonDY - 30 + 'px',
@@ -199,9 +245,8 @@ function drawFrame(timestamp) {
       });
       ctx.fill();
     } else {
-      ctx.fillStyle = 'brown';
       ctx.beginPath();
-      ctx.arc(p.x, p.y, 50, 0, 2*Math.PI);
+      ctx.arc(p.x, p.y, p.size, 0, 2*Math.PI);
       ctx.fill();
     }
   });

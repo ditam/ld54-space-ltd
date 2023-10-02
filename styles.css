@@ -166,6 +166,11 @@ canvas {
   color: rgba(255, 255, 255, 0.5);
 }
 
+.inventory.ships .header,
+.inventory.ships .container {
+  padding-bottom: 8px;
+}
+
 .table .row {
   line-height: 10px; /* smaller than cell size to avoid gaps */
 }
