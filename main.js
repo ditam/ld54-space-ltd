@@ -75,7 +75,8 @@ const player = {
       [0, 0, 0],
       [0, 0, 0]
     ],
-    items: []
+    items: [],
+    target: planets[1]
   },
   {
     name: 'SLC Debugio',
@@ -138,6 +139,21 @@ function updateOrbitInfo() {
       container.append(shipCargoDOM);
     });
   });
+
+  // show/hide panels based on ship orbits
+  planets.forEach(p => {
+    let shipsInOrbitCount = 0;
+    player.ships.forEach(s => {
+      if (s.inOrbitAt === p) {
+        shipsInOrbitCount++;
+      }
+    });
+    if (shipsInOrbitCount > 0) {
+      showPlanetInfo(p);
+    } else {
+      hidePlanetInfo(p);
+    }
+  })
 }
 
 function _getDebugLog(){
@@ -204,31 +220,38 @@ function drawFrame(timestamp) {
       dX = dX / dist;
       dY = dY / dist;
       if (dist > ORBIT_DIST) {
+        // en-route to orbit
         s.x += dX * BASE_SPEED;
         s.y += dY * BASE_SPEED;
         if (s.inOrbitAt) {
           // leaving orbit
-          hidePlanetInfo(s.inOrbitAt);
           newOrbitData = true;
           delete s.inOrbitAt;
         }
+        // draw ship - ships are only visible en-route to an orbit
+        ctx.fillStyle = 'gray';
+        ctx.fillRect(s.x, s.y, 40, 40);
       } else {
+        // at orbit
         if (s.inOrbitAt !== s.target) {
           // entering orbit
-          showPlanetInfo(s.target);
           newOrbitData = true;
           s.inOrbitAt = s.target;
           checkDeliveriesAtPlanet(s, s.target);
+        }
+        // stick / snap to orbited planet
+        if (s.target.type === 'moon') {
+          s.x = s.target.x + moonDX;
+          s.y = s.target.y + moonDY;
+        } else {
+          s.x = s.target.x;
+          s.y = s.target.y;
         }
       }
       if (newOrbitData) {
         updateOrbitInfo();
       }
     }
-
-    // draw ship
-    ctx.fillStyle = 'gray';
-    ctx.fillRect(s.x, s.y, 40, 40);
   });
 
   requestAnimationFrame(drawFrame);
