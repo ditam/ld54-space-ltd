@@ -26,7 +26,7 @@ const planets = [
     }, {
       contractID: getNewID(),
       price: 800,
-      destination: 'Deucalion',
+      destination: 'Echion',
       cargo: [
         [0, 4],
         [4, 4],
@@ -48,7 +48,7 @@ const planets = [
       ]
     }]
   },  {
-    name: 'Deucalion',
+    name: 'Echion',
     type: 'moon',
     orbitSize: 200,
     x: 1300,
@@ -64,27 +64,25 @@ planets.forEach(p=>{
   planet2DOM[p.name] = {};
 });
 
+const ship0Image = $('<img>').attr('src', 'assets/ship1.png');
+const ship1Image = $('<img>').attr('src', 'assets/ship2.png');
+const ship2Image = $('<img>').attr('src', 'assets/ship3.png');
+function getShipImageClone(i) {
+  console.assert(i < 3);
+  return [ship0Image, ship1Image, ship2Image][i].clone().get(0);
+}
+
 const player = {
   score: 0, // aka money
   ships: [{
     name: 'SLC Manaca',
+    image: getShipImageClone(0),
     x: 300,
     y: 450,
     cargo: [
       [0, 0, 0],
       [0, 0, 0],
       [0, 0, 0]
-    ],
-    items: [],
-    target: planets[1]
-  },
-  {
-    name: 'SLC Debugio',
-    x: 500,
-    y: 800,
-    cargo: [
-      [0, 0],
-      [0, 0]
     ],
     items: [],
     target: planets[1]
@@ -157,7 +155,9 @@ function updateOrbitInfo() {
     } else {
       hidePlanetInfo(p);
     }
-  })
+  });
+
+  updateShipList();
 }
 
 function _getDebugLog(){
@@ -274,9 +274,6 @@ $(document).ready(function() {
   container = $(document.getElementById('overlay-container'));
   debugLog = $(document.getElementById('debug-log'));
   floater = $(document.getElementById('floater'));
-  scoreCounter = $(document.getElementById('score-counter'));
-  shipList = $(document.getElementById('ship-list'));
-
   ctx.fillStyle = '#88DD88';
   ctx.strokeStyle = 'black';
   ctx.lineWidth = 1;
@@ -316,8 +313,13 @@ $(document).ready(function() {
 
   // blast off
   generateStarfield();
+  generateHUD();
   updateScore();
-  updateShipList();
   generatePlanetInfoPanels();
   drawFrame(0);
+
+  if (DEBUG) {
+    player.score = 5000;
+    updateScore();
+  }
 });

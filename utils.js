@@ -27,7 +27,7 @@ function deepCopy(o) {
 
 let DEBUG = location && location.hostname==='localhost';
 
-let body, container, ctx, debugLog, scoreCounter, shipList;
+let body, buyShipButton, container, ctx, debugLog, scoreCounter, shipList;
 
 let startfieldInitialized = false;
 function generateStarfield() {
@@ -59,22 +59,166 @@ function generateStarfield() {
   });
 }
 
+let hudInitialized = false;
+function generateHUD() {
+  console.assert(!hudInitialized);
+  hudInitialized = true;
+
+  const hud = $('<div id="hud"></div>').addClass('hud');
+  shipList = $('<div></div>').addClass('ship-list');
+  scoreCounter = $('<div></div>').addClass('score-counter');
+  hud.append(shipList);
+  hud.append(scoreCounter);
+
+  player.ships.forEach((ship, i) => {
+    generateShipPanelForHUD(shipList, ship, i);
+  });
+
+  buyShipButton = $('<div></div>').addClass('buy-button').text('+');
+  buyShipButton.on('click', showShipBuyingPanel);
+  buyShipButton.appendTo(shipList);
+
+  hud.appendTo(body);
+}
+
+const shipNames = [
+  'SLC Manaca',
+  'SLC Ondorre',
+  'SLC Branao',
+  'SLC Votocan',
+  'SLC Kawaet',
+  'SLC Qetor',
+  'SLC Malto'
+];
+function showShipBuyingPanel() {
+  const msgContainer = $('<div></div>').addClass('msg-container ship-buying');
+  const msgText = $('<div></div>').addClass('msg-body').text('Select a ship to buy:');
+  msgText.appendTo(msgContainer);
+
+  const shipsForSale = [
+    {
+      type: 'light cargo',
+      cargoSpace: '3x3',
+      cost: 1000,
+      image: getShipImageClone(0),
+      cargo: [
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]
+      ],
+    },
+    {
+      type: 'heavy cargo',
+      cargoSpace: '4x4',
+      cost: 2500,
+      image: getShipImageClone(1),
+      cargo: [
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0]
+      ],
+    },
+    {
+      type: 'speedster',
+      cargoSpace: '2x1',
+      cost: 1500,
+      image: getShipImageClone(2),
+      cargo: [
+        [0],
+        [0],
+      ],
+    }
+  ];
+
+  shipsForSale.forEach(s => {
+    const shipButton = $('<div></div>').addClass('button full-width');
+    shipButton.text(`Type: ${s.type}, cargo space: ${s.cargoSpace}, cost: $${s.cost}`);
+    shipButton.appendTo(msgContainer);
+
+    shipButton.on('click', () => {
+      if (player.score >= s.cost) {
+        player.score -= s.cost;
+        updateScore();
+        const newShip = {
+          name: shipNames[player.ships.length],
+          image: s.image,
+          x: planets[0].x,
+          y: planets[0].y,
+          cargo: deepCopy(s.cargo),
+          items: [],
+          target: planets[0],
+          inOrbitAt: planets[0]
+        };
+        player.ships.push(newShip);
+        generateShipPanelForHUD(shipList, newShip, player.ships.length-1);
+        buyShipButton.detach();
+        buyShipButton.appendTo(shipList);
+        updateOrbitInfo();
+      } else {
+        console.log('not enough money. TODO: error sound');
+        // TODO: play error sound
+      }
+      msgContainer.remove();
+    });
+  });
+
+  const msgDismiss = $('<div></div>').addClass('msg-dismiss').text('Click here to dismiss.');
+  msgDismiss.appendTo(msgContainer);
+
+  msgDismiss.on('click', () => {
+    msgContainer.remove();
+  });
+
+  msgContainer.appendTo(body);
+}
+
+function generateShipPanelForHUD(container, ship, index) {
+  const shipEl = $('<div></div>').addClass('ship');
+  if (ship.inOrbitAt) {
+    shipEl.addClass('in-orbit');
+  } else {
+    shipEl.addClass('in-travel');
+  }
+
+  const shipName = $('<div></div>').addClass('ship-name').text(ship.name);
+  const shipImg =  $('<div></div>').addClass('ship-img').append(ship.image);
+  const moveIcon = $('<img src="assets/icons/in-travel.png"></img>').addClass('status in-travel');
+  const orbitIcon = $('<img src="assets/icons/in-orbit.png"></img>').addClass('status in-orbit');
+  const targetName = $('<div></div>').addClass('target-name').text(ship.target.name);
+
+  shipEl.append(shipName);
+  shipEl.append(shipImg);
+  shipEl.append(moveIcon);
+  shipEl.append(orbitIcon);
+  shipEl.append(targetName);
+
+  shipEl.on('click', () => {
+    activeShipIndex = index;
+    updateShipList();
+  });
+
+  container.append(shipEl);
+}
+
 function updateScore() {
   scoreCounter.text('$'+player.score);
 }
 
 function updateShipList() {
-  let shipNames = '';
-  player.ships.forEach((ship, i) => {
-    shipNames += ship.name;
-    if (i === activeShipIndex) {
-      shipNames += ' (active)';
-    }
-    if (i < player.ships.length-1) {
-      shipNames += ', ';
+  const shipEls = shipList.find('.ship');
+  shipEls.removeClass('active');
+  shipEls.eq(activeShipIndex).addClass('active');12
+
+  shipEls.removeClass('in-travel in-orbit');
+  player.ships.forEach((s, i) => {
+    shipEls.eq(i).find('.target-name').text(s.target.name);
+    if (s.inOrbitAt) {
+      shipEls.eq(i).addClass('in-orbit');
+    } else {
+      shipEls.eq(i).addClass('in-travel');
     }
   });
-  shipList.text(shipNames);
 }
 
 let _floaterVisible = false;
@@ -296,6 +440,7 @@ function generatePlanetInfoPanels() {
     button.appendTo(nameContainer);
     button.on('click', () => {
       player.ships[activeShipIndex].target = p;
+      updateShipList();
     });
 
     const nameLabel = $('<div></div>').addClass(['label', 'name']);

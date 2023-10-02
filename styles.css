@@ -17,11 +17,6 @@ canvas {
   font-family: monospace;
 }
 
-#score-counter {
-  position: absolute;
-  top: 1110px;
-}
-
 #backdrop {
   position: absolute;
   width: 1920px;
@@ -35,8 +30,81 @@ canvas {
 
 #hud {
   position: absolute;
-  padding: 10px;
-  border: 1px solid white;
+}
+
+#hud .ship,
+#hud .buy-button {
+  position: relative;
+  display: inline-block;
+  margin-top: 16px;
+  margin-left: 16px;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.05);
+  width: 240px;
+  height: 84px;
+}
+
+#hud .ship.active {
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+#hud .ship:hover,
+#hud .buy-button:hover {
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+#hud .ship .ship-img {
+  position: absolute;
+  left: 16px;
+  top: 24px;
+  width: 32px;
+  height: 32px;
+  filter: grayscale();
+}
+
+#hud .ship.in-travel .status.in-orbit{
+  display: none;
+}
+
+#hud .ship.in-orbit .status.in-travel{
+  display: none;
+}
+
+#hud .ship img.status {
+  position: absolute;
+  left: 64px;
+  top: 40px;
+  width: 32px;
+  height: 32px;
+}
+
+#hud .ship .ship-name {
+  position: absolute;
+  left: 64px;
+  top: 16px;
+  font-size: 14px;
+}
+
+#hud .ship .target-name {
+  position: absolute;
+  left: 108px;
+  top: 50px;
+  font-size: 10px;
+}
+
+#hud .buy-button {
+  top: -22px; /* FIXME: wtf is this, why is it necessary? */
+  font-size: 64px;
+  width: 64px;
+  line-height: 70px;
+  text-align: center;
+}
+
+#hud .score-counter {
+  margin-left: 16px;
+  font-size: 18px;
 }
 
 .name-container {
@@ -133,6 +201,17 @@ body.dragging .inventory.ships .table .cell:hover {
   top: 500px;
   left: 700px;
   background-color: #2b2b2b;
+}
+
+.msg-container.ship-buying {
+  width: 800px;
+  left: 500px;
+}
+
+.msg-container .button.full-width {
+  display: inline-block;
+  padding: 10px;
+  width: 100%;
 }
 
 .msg-container .button.yes {
