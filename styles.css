@@ -225,8 +225,9 @@ body.dragging .inventory.ships .table .cell:hover {
   position: absolute;
   padding: 30px;
   top: 500px;
-  left: 700px;
+  left: 500px;
   background-color: #2b2b2b;
+  line-height: 30px;
 }
 
 .msg-container.ship-buying {

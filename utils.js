@@ -408,22 +408,34 @@ function refreshPlanetContracts(container, planet) {
   });
 }
 
-function showMessage(text, callback) {
-  const msgContainer = $('<div></div>').addClass('msg-container');
-  const msgText = $('<div></div>').addClass('msg-body').text(text);
-  msgText.appendTo(msgContainer);
-  const yesButton = $('<div></div>').addClass('button yes').text('Yes');
-  const noButton = $('<div></div>').addClass('button no').text('No');
-  yesButton.on('click', () => {
-    msgContainer.remove();
-    callback(true);
+function showMessage(lines, callback, cssClass) {
+  if (!Array.isArray(lines)) {
+    lines = [lines];
+  }
+  const msgContainer = $('<div></div>').addClass('msg-container').addClass(cssClass);
+
+  lines.forEach(line => {
+    $('<div></div>').addClass('msg-body').text(line).appendTo(msgContainer);
   });
-  noButton.on('click', () => {
-    msgContainer.remove();
-    callback(false);
-  });
-  yesButton.appendTo(msgContainer);
-  noButton.appendTo(msgContainer);
+
+  if (callback) {
+    const yesButton = $('<div></div>').addClass('button yes').text('Yes');
+    const noButton = $('<div></div>').addClass('button no').text('No');
+    yesButton.on('click', () => {
+      msgContainer.remove();
+      callback(true);
+    });
+    noButton.on('click', () => {
+      msgContainer.remove();
+      callback(false);
+    });
+    yesButton.appendTo(msgContainer);
+    noButton.appendTo(msgContainer);
+  } else {
+    msgContainer.on('click', () => {
+      msgContainer.remove();
+    });
+  }
 
   msgContainer.appendTo(body);
 }
@@ -478,7 +490,10 @@ function generatePlanetInfoPanels() {
     img2.appendTo(button2);
     button2.on('click', () => {
       showMessage(
-        `Would you like to pay $500 to set up a com-link at ${p.name}?`,
+        [
+          `Would you like to pay $500 to set up a com-link at ${p.name}?`,
+          `(A com-link enables you to view cargo requests at a planet remotely, even when not in orbit.)`
+        ],
         function(approved) {
           if (approved) {
             button2.hide();

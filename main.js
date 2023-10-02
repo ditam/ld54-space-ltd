@@ -364,11 +364,23 @@ $(document).ready(function() {
     songs[currentSongIndex].play();
   }
 
+  // set up tutorial
+  const welcomeLines = [
+    'Greetings.',
+    'Your request for monopoly on cargo services in sector Sic-03-B was granted.',
+    'This sector was recently hit by a solar flare. Interplanetary communications are down.',
+    '',
+    'Click to continue'
+  ];
+
   // attach mouse events
   const splash = $('#splash');
   splash.on('click', function(){
     playNextSong();
     splash.remove();
+    setTimeout(function() {
+      showMessage(welcomeLines, null, 'tutorial-main');
+    }, 2000);
   });
 
   document.addEventListener('mousemove', function(event){
