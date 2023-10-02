@@ -237,37 +237,110 @@ function refreshPlanetContracts(container, planet) {
   });
 }
 
+function showMessage(text, callback) {
+  const msgContainer = $('<div></div>').addClass('msg-container');
+  const msgText = $('<div></div>').addClass('msg-body').text(text);
+  msgText.appendTo(msgContainer);
+  const yesButton = $('<div></div>').addClass('button yes').text('Yes');
+  const noButton = $('<div></div>').addClass('button no').text('No');
+  yesButton.on('click', () => {
+    msgContainer.remove();
+    callback(true);
+  });
+  noButton.on('click', () => {
+    msgContainer.remove();
+    callback(false);
+  });
+  yesButton.appendTo(msgContainer);
+  noButton.appendTo(msgContainer);
+
+  msgContainer.appendTo(body);
+}
+
 function hidePlanetInfo(planet) {
-  // TODO: override by comlink setting
+  console.assert(planet);
+  if (planet.hasComlink && planet.comlinkOn) {
+    return;
+  }
+  planet2DOM[planet.name].dom1.find('.button.comlink-enable').hide();
   planet2DOM[planet.name].dom2.hide();
   planet2DOM[planet.name].dom3.hide();
 }
 
 function showPlanetInfo(planet) {
+  console.assert(planet);
+  if (!planet.hasComlink) {
+    planet2DOM[planet.name].dom1.find('.button.comlink-enable').show();
+  }
   planet2DOM[planet.name].dom2.show();
   planet2DOM[planet.name].dom3.show();
 }
 
 function generatePlanetInfoPanels() {
   planets.forEach(p=>{
-    // generate buttons
-    const button = $('<div>go</div>').addClass('button');
-    button.css({
-      top: p.y + 'px',
-      left: p.x + 'px'
+    // generate planet name area with buttons
+    const nameContainer = $('<div></div>').addClass('name-container');
+    nameContainer.appendTo(container);
+    nameContainer.css({
+      // TODO: actually center, based on name length / actual width
+      top: p.y - 90 + 'px',
+      left: p.x - 100 + 'px'
     });
+
+    const button = $('<div></div>').addClass(['button', 'go']);
+    const img = $('<img src="assets/icons/travel.png"></img>');
+    img.appendTo(button);
+
     button.data('planet', p);
-    button.appendTo(container);
+    button.appendTo(nameContainer);
     button.on('click', () => {
       player.ships[activeShipIndex].target = p;
     });
+
+    const nameLabel = $('<div></div>').addClass(['label', 'name']);
+    nameLabel.text(p.name);
+    nameLabel.appendTo(nameContainer);
+
+    const button2 = $('<div></div>').addClass(['button', 'comlink-enable']);
+    const img2 = $('<img src="assets/icons/add-comlink.png"></img>');
+    img2.appendTo(button2);
+    button2.on('click', () => {
+      showMessage(
+        `Would you like to pay $500 to set up a com-link at ${p.name}?`,
+        function(approved) {
+          if (approved) {
+            button2.hide();
+            button3.show();
+            player.score -= 500;
+            updateScore();
+            p.hasComlink = true;
+            updateOrbitInfo();
+          }
+        }
+      );
+    });
+    button2.hide();
+    button2.appendTo(nameContainer);
+
+    const button3 = $('<div></div>').addClass(['button', 'comlink-toggle']);
+    const img3 = $('<img src="assets/icons/comlink.png"></img>');
+    button3.on('click', () => {
+      p.comlinkOn = !(p.comlinkOn);
+      console.log('comlink toggled to:', p.comlinkOn);
+      button3.removeClass(['comlink-on', 'comlink-off']);
+      button3.addClass(p.comlinkOn? 'comlink-on' : 'comlink-off');
+      updateOrbitInfo();
+    });
+    button3.hide();
+    img3.appendTo(button3);
+    button3.appendTo(nameContainer);
+
     // generate inventory
     const planetInventory = $('<div></div>').addClass(['inventory', 'planet']);
     planetInventory.css({
       top: p.y - 30 + 'px',
       left: p.x - 180 + 'px'
     });
-    $('<div></div>').text(p.name).appendTo(planetInventory);
 
     const contractsContainer = $('<div></div>').addClass('container').appendTo(planetInventory);
     refreshPlanetContracts(contractsContainer, p);
@@ -301,7 +374,7 @@ function generatePlanetInfoPanels() {
     shipInventory.hide();
 
     // save shortcuts
-    planet2DOM[p.name].dom1 = button;
+    planet2DOM[p.name].dom1 = nameContainer;
     planet2DOM[p.name].dom2 = planetInventory;
     planet2DOM[p.name].dom3 = shipInventory;
   });

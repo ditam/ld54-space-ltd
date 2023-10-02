@@ -2,13 +2,13 @@
 let activeShipIndex = 0;
 const planets = [
   {
-    name: 'P1',
+    name: 'Siracusa III',
     x: 1300,
     y: 350,
     contracts: [{
       contractID: getNewID(),
       price: 500,
-      destination: 'P2',
+      destination: 'Agrigento VI',
       cargo: [
         [0, 1],
         [0, 1],
@@ -17,7 +17,7 @@ const planets = [
     }, {
       contractID: getNewID(),
       price: 120,
-      destination: 'P2',
+      destination: 'Agrigento VI',
       cargo: [
         [2, 2],
         [0, 2],
@@ -26,7 +26,7 @@ const planets = [
     }, {
       contractID: getNewID(),
       price: 800,
-      destination: 'P3',
+      destination: 'Deucalion',
       cargo: [
         [0, 4],
         [4, 4],
@@ -35,20 +35,20 @@ const planets = [
     }]
   },
   {
-    name: 'P2',
+    name: 'Agrigento VI',
     x: 500,
     y: 800,
     contracts: [{
       contractID: getNewID(),
       price: 100,
-      destination: 'P1',
+      destination: 'Siracusa III',
       cargo: [
         [2, 2],
         [2, 2]
       ]
     }]
   },  {
-    name: 'P3',
+    name: 'Deucalion',
     type: 'moon',
     orbitSize: 200,
     x: 1300,
@@ -142,6 +142,10 @@ function updateOrbitInfo() {
 
   // show/hide panels based on ship orbits
   planets.forEach(p => {
+    if (p.comlinkOn) {
+      showPlanetInfo(p);
+      return;
+    }
     let shipsInOrbitCount = 0;
     player.ships.forEach(s => {
       if (s.inOrbitAt === p) {
@@ -171,7 +175,7 @@ function drawFrame(timestamp) {
   }
 
   // TODO: make moon-specific with orbit size? Might be too much work
-  const time = timestamp/(50 * 1000);
+  const time = timestamp/(75 * 1000); // orbit duration
   const moonDX = Math.sin(time%2*Math.PI) * 200;
   const moonDY = Math.cos(time%2*Math.PI) * 200;
 
@@ -182,8 +186,8 @@ function drawFrame(timestamp) {
       ctx.beginPath();
       ctx.arc(p.x + moonDX, p.y + moonDY, 20, 0, 2*Math.PI);
       planet2DOM[p.name].dom1.css({
-        top: p.y + moonDY + 'px',
-        left: p.x + moonDX + 'px'
+        top: p.y + moonDY - 60 + 'px',
+        left: p.x + moonDX - 100 + 'px'
       });
       planet2DOM[p.name].dom2.css({
         top: p.y + moonDY - 30 + 'px',

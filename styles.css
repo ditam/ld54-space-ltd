@@ -1,6 +1,7 @@
 body {
   background-color: #eee;
   font-family: 'Michroma', sans-serif;
+  color: white;
 }
 
 canvas {
@@ -10,6 +11,7 @@ canvas {
 }
 
 #debug-log {
+  color: black;
   position: absolute;
   top: 1080px;
   font-family: monospace;
@@ -33,24 +35,45 @@ canvas {
 
 #hud {
   position: absolute;
-  background-color: white;
+  padding: 10px;
+  border: 1px solid white;
 }
 
-.button {
+.name-container {
   position: absolute;
-  cursor: pointer;
-  padding: 5px;
-  border: 1px solid black;
-  border-radius: 3px;
 }
 
-.button:hover {
+.name-container .button {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 5px;
+}
+
+.name-container .button img {
+  width: 24px;
+  height: 24px;
+}
+
+.name-container .button.comlink-on img {
+  filter: brightness(70%) sepia(1) hue-rotate(80deg);
+}
+
+.name-container .button:hover {
   background-color: rgba(255, 255, 255, 0.3);
+}
+
+.name-container .label {
+  display: inline-block;
+  vertical-align: super;
+  padding-left: 8px;
+  padding-right: 8px;
 }
 
 .inventory {
   position: absolute;
-  background: white;
   padding: 15px;
 }
 
@@ -104,3 +127,27 @@ body.dragging .inventory.ships .table .cell:hover {
   border: 1px transparent;
 }
 
+.msg-container {
+  position: absolute;
+  padding: 30px;
+  top: 500px;
+  left: 700px;
+  background-color: #2b2b2b;
+}
+
+.msg-container .button.yes {
+  display: inline-block;
+  padding: 10px 100px;
+  margin-left: 105px;
+  margin-top: 30px;
+}
+
+.msg-container .button.no {
+  display: inline-block;
+  padding: 10px 100px;
+}
+
+.msg-container .button:hover {
+  cursor: pointer;
+  background-color: #8e8d8da8;
+}
