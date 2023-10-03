@@ -209,6 +209,18 @@ function generateShipPanelForHUD(container, ship, index) {
 
 function updateScore() {
   scoreCounter.text('$ '+player.score);
+
+  // check win condition
+  if (player.score >= 5000 && planets.filter(p=>p.hasComlink).length >= 5) {
+    showMessage(
+      [
+        'Congratulations!',
+        'You have restored communications to this sector, and delivered a lot of cargo.',
+        'Thank you for playing.',
+        'Check back later for more levels!'
+      ]
+    );
+  }
 }
 
 function updateShipList() {
@@ -556,9 +568,9 @@ function generatePlanetInfoPanels() {
           if (approved) {
             button2.hide();
             button3.show();
+            p.hasComlink = true;
             player.score -= 500;
             updateScore();
-            p.hasComlink = true;
             updateOrbitInfo();
           }
         }
