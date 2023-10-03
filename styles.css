@@ -41,7 +41,7 @@ canvas {
   border-radius: 8px;
   background-color: rgba(255, 255, 255, 0.05);
   width: 240px;
-  height: 84px;
+  height: 90px;
 }
 
 #hud .ship.active {
@@ -58,7 +58,7 @@ canvas {
 #hud .ship .ship-img {
   position: absolute;
   left: 16px;
-  top: 24px;
+  top: 27px;
   width: 32px;
   height: 32px;
   filter: grayscale();
@@ -95,7 +95,7 @@ canvas {
 }
 
 #hud .buy-button {
-  top: -22px; /* FIXME: wtf is this, why is it necessary? */
+  top: -27px; /* FIXME: wtf is this, why is it necessary? */
   font-size: 64px;
   width: 64px;
   line-height: 70px;
@@ -244,7 +244,7 @@ body.dragging .inventory.ships .table .cell:hover {
 .msg-container .button.yes {
   display: inline-block;
   padding: 10px 100px;
-  margin-left: 105px;
+  margin-left: 205px;
   margin-top: 30px;
 }
 
