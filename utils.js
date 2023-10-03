@@ -288,6 +288,7 @@ function generateRandomContract() {
     destination: selectedTarget.name,
     cargo: deepCopy(selectedCargo)
   });
+  refreshAllPlanetContracts();
   updateOrbitInfo();
 }
 
@@ -453,6 +454,13 @@ function getCargoType(cargo) {
     }
   }
   console.assert(false, 'Expected valid cell in first row of cargo');
+}
+
+function refreshAllPlanetContracts() {
+  planets.forEach(p => {
+    const contractsContainer = planet2DOM[p.name].dom2.find('.container');
+    refreshPlanetContracts(contractsContainer, p);
+  });
 }
 
 function refreshPlanetContracts(container, planet) {
