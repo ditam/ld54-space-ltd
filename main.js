@@ -439,14 +439,12 @@ $(document).ready(function() {
   });
 
   document.addEventListener('keydown', function(event) {
-    if (event.key === '1') {
-      activeShipIndex = 0;
-      updateShipList();
-    }
-    // TODO: block if ship count < 2
-    if (event.key === '2') {
-      activeShipIndex = 1;
-      updateShipList();
+    if (['1', '2', '3', '4', '5', '6', '7'].includes(event.key)) {
+      const selectedNum = Number(event.key);
+      if (player.ships.length >= selectedNum) {
+        activeShipIndex = selectedNum - 1; // 0-based!
+        updateShipList();
+      }
     }
   });
 
@@ -458,7 +456,7 @@ $(document).ready(function() {
   drawFrame(0);
 
   if (DEBUG) {
-    player.score = 5000;
+    player.score = 12000;
     updateScore();
   }
 });

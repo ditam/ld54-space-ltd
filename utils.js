@@ -81,6 +81,7 @@ function generateHUD() {
   hud.appendTo(body);
 }
 
+const MAX_SHIPS = 7;
 const shipNames = [
   'SLC Manaca',
   'SLC Ondorre',
@@ -156,7 +157,9 @@ function showShipBuyingPanel() {
         player.ships.push(newShip);
         generateShipPanelForHUD(shipList, newShip, player.ships.length-1);
         buyShipButton.detach();
-        buyShipButton.appendTo(shipList);
+        if (player.ships.length < MAX_SHIPS) {
+          buyShipButton.appendTo(shipList);
+        }
         updateOrbitInfo();
       } else {
         console.log('not enough money.');
@@ -205,7 +208,7 @@ function generateShipPanelForHUD(container, ship, index) {
 }
 
 function updateScore() {
-  scoreCounter.text('$'+player.score);
+  scoreCounter.text('$ '+player.score);
 }
 
 function updateShipList() {
