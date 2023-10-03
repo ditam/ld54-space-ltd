@@ -23,6 +23,14 @@ const planets = [
         [1, 1],
         [1, 1]
       ]
+    },{
+      contractID: getNewID(),
+      price: 200,
+      destination: 'Echion',
+      cargo: [
+        [2, 2],
+        [0, 2],
+      ]
     }]
   },
   {
@@ -38,6 +46,13 @@ const planets = [
       cargo: [
         [2, 2],
         [2, 2]
+      ]
+    }, {
+      contractID: getNewID(),
+      price: 350,
+      destination: 'Echion',
+      cargo: [
+        [1, 1]
       ]
     }]
   },
@@ -67,12 +82,12 @@ const planets = [
       ]
     }, {
       contractID: getNewID(),
-      price: 800,
-      destination: 'Echion',
+      price: 500,
+      destination: 'Trapana IX',
       cargo: [
-        [0, 4],
-        [4, 4],
-        [4, 0]
+        [0, 3],
+        [3, 3],
+        [3, 0]
       ]
     }]
   },
@@ -98,6 +113,14 @@ const planets = [
       cargo: [
         [1, 1],
         [1, 1]
+      ]
+    },{
+      contractID: getNewID(),
+      price: 750,
+      destination: 'Agrigento VI',
+      cargo: [
+        [4, 4],
+        [0, 4]
       ]
     }]
   },
@@ -125,6 +148,7 @@ const player = {
     image: getShipImageClone(0),
     x: 400,
     y: 300,
+    speed: BASE_SPEED,
     cargo: [
       [0, 0, 0],
       [0, 0, 0],
@@ -272,8 +296,8 @@ function drawFrame(timestamp) {
       dY = dY / dist;
       if (dist > ORBIT_DIST) {
         // en-route to orbit
-        s.x += dX * BASE_SPEED;
-        s.y += dY * BASE_SPEED;
+        s.x += dX * s.speed;
+        s.y += dY * s.speed;
         if (s.inOrbitAt) {
           // leaving orbit
           newOrbitData = true;

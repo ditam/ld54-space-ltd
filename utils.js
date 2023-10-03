@@ -100,6 +100,7 @@ function showShipBuyingPanel() {
       type: 'light cargo',
       cargoSpace: '3x3',
       cost: 1000,
+      speed: BASE_SPEED,
       image: getShipImageClone(0),
       cargo: [
         [0, 0, 0],
@@ -111,6 +112,7 @@ function showShipBuyingPanel() {
       type: 'heavy cargo',
       cargoSpace: '4x4',
       cost: 2500,
+      speed: BASE_SPEED * 0.75,
       image: getShipImageClone(1),
       cargo: [
         [0, 0, 0, 0],
@@ -123,10 +125,10 @@ function showShipBuyingPanel() {
       type: 'speedster',
       cargoSpace: '2x1',
       cost: 1500,
+      speed: BASE_SPEED * 2.5,
       image: getShipImageClone(2),
       cargo: [
-        [0],
-        [0],
+        [0, 0],
       ],
     }
   ];
@@ -145,6 +147,7 @@ function showShipBuyingPanel() {
           image: s.image,
           x: planets[0].x,
           y: planets[0].y,
+          speed: s.speed,
           cargo: deepCopy(s.cargo),
           items: [],
           target: planets[0],
