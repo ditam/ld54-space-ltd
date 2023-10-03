@@ -280,7 +280,16 @@ function drawFrame(timestamp) {
           delete s.inOrbitAt;
         }
         // draw ship - ships are only visible en-route to an orbit
-        ctx.drawImage(s.image, s.x, s.y, 32, 32);
+        ctx.save();
+          ctx.translate(s.x, s.y);
+          let angle = Math.atan(dY/dX) + Math.PI/2;
+          if (dX < 0) {
+            angle -= Math.PI;
+          }
+          ctx.rotate(angle);
+          ctx.translate(-s.x, -s.y);
+          ctx.drawImage(s.image, s.x, s.y, 32, 32);
+        ctx.restore();
       } else {
         // at orbit
         if (s.inOrbitAt !== s.target) {
