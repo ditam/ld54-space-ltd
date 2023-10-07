@@ -395,7 +395,7 @@ $(document).ready(function() {
 
   let currentSongIndex = -1; // -1 so first call toggles to index 0
   function playNextSong() {
-    currentSongIndex = (currentSongIndex + 1) % 2;
+    currentSongIndex = (currentSongIndex + 1) % songs.length;
     songs[currentSongIndex].play();
   }
 
