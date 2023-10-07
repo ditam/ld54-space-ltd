@@ -1,1 +1,7 @@
 The icons used were published with a CC0 license on iconduck.com
+
+The music tracks used were published with a CC0 license on opengameart.com,
+the songs are:
+bgSong01.mp3 -> Observing The Star by yd https://opengameart.org/content/another-space-background-track
+bgSong02.mp3 -> Galactic Temple by yd https://opengameart.org/content/galactic-temple
+bgSong03.mp3 -> Space Array by Tozan https://opengameart.org/content/deep-space-array
