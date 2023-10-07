@@ -280,8 +280,21 @@ function generateRandomContract() {
   ];
   const selectedPlanet = getRandomItem(planets);
   const selectedCargo = getRandomItem(cargos);
-  const selectedTarget = getRandomItem(planets);
-  const price = getRandomItem([50, 120, 200, 250, 300, 500, 600, 850]);
+  let selectedTarget = getRandomItem(planets);
+  let price = getRandomItem([50, 70, 120, 200, 250, 450]);
+  const iCargoIndex = cargos.findIndex(c => c===selectedCargo);
+  price += iCargoIndex * 50; // bigger items should average around bigger prices
+
+  if (selectedPlanet === selectedTarget) {
+    const iPlanetIndex = planets.findIndex(p => p===selectedPlanet);
+    if (iPlanetIndex + 1 < planets.length) {
+      selectedTarget = planets[iPlanetIndex+1];
+    } else {
+      selectedTarget = planets[0];
+    }
+  }
+  console.log(`new contract: ${selectedPlanet.name} -> ${selectedTarget.name} for ${price}`);
+
   selectedPlanet.contracts.push({
     contractID: getNewID(),
     price: price,

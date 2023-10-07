@@ -17,7 +17,7 @@ const planets = [
     size: 50,
     contracts: [{
       contractID: getNewID(),
-      price: 100,
+      price: 150,
       destination: 'Siracusa III',
       cargo: [
         [1, 1],
@@ -41,7 +41,7 @@ const planets = [
     size: 45,
     contracts: [{
       contractID: getNewID(),
-      price: 100,
+      price: 150,
       destination: 'Siracusa III',
       cargo: [
         [2, 2],
@@ -108,7 +108,7 @@ const planets = [
     size: 30,
     contracts: [{
       contractID: getNewID(),
-      price: 100,
+      price: 150,
       destination: 'Siracusa III',
       cargo: [
         [1, 1],
